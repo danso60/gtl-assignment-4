@@ -1,64 +1,45 @@
-from flask import Flask, render_template
-import os
-import sqlite3
-from flask_sqlalchemy import SQLAlchemy as sql
-from flask_migrate import Migrate
+import flask
+from flask import request, jsonify
+from flask_cors import CORS 
 
-b_dir = os.path.abspath(os.path.dirname(__file__))
+app = flask.Flask(__name__)
+app.config["DEBUG"] = True
+CORS(app)
 
-app = Flask(__name__)
-
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+os.path.join(b_dir,'data.sqlite')
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = sql(app)
-
-Migrate(app,db)
-
-class CountryHealthReport(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    country = db.Column(db.Text)
-    totalcase = db.Column(db.Integer)
-    recoveries = db.Column(db.Integer)
-    activecase = db.Column(db.Integer)
-    totaldeaths = db.Column(db.Integer)
-
-    def __init__(self,country,totalcase,recoveries,activecase,totaldeaths):
-        self.country = country
-        self.totalcase = totalcase
-        self.recoveries = recoveries
-        self.activecase = activecase
-        self.totaldeaths = totaldeaths
-
-    def __repr__(self):
-        return f'{self.totalcase}'
-
-@app.route('/')
-
-def Index():
-    HealthState = CountryHealthReport.query.all()
-    return render_template('index.html',HealthState=HealthState)
-
-if __name__=='__main__':
-    app.run()
-
-# import sqlite3
-# from flask import g
-
-# DATABASE = '/path/to/database.db'
-
-# def get_db():
-#     db = getattr(g, '_database', None)
-#     if db is None:
-#         db = g._database = sqlite3.connect(DATABASE)
-#     return db
-
-# @app.teardown_appcontext
-# def close_connection(exception):
-#     db = getattr(g, '_database', None)
-#     if db is not None:
-#         db.close()
+covidcases = [
+    {'id': 0,
+     'country': 'Ghana',
+     'total_cases': '11,118',
+     'recoveries': '3979',
+     'active_cases': '7000',
+     'total_deaths': '48'
+     },
+    {'id': 1,
+     'country': 'Nigeria',
+     'total_cases': '17,218',
+     'recoveries': '15,008',
+     'active_cases': '2,000',
+     'total_deaths': '210'
+     },
+   {'id': 2,
+     'country': 'Egypt',
+     'total_cases': '20,000',
+     'recoveries': '18,001',
+     'active_cases': '1,900',
+     'total_deaths': '99'
+     }
+]
 
 
+@app.route('/', methods=['GET'])
+def home():
+    return '''<h1>Covid tracker</h1>
+<p>covid application api to track their cases created successfully... </p>'''
+
+
+# A route to return all of the available entries.
+@app.route('/app/v1/resources/covid/all', methods=['GET'])
+def api():
+    return jsonify(covidcases)
+
+app.run()

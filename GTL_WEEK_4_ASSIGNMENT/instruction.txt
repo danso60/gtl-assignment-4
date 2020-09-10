@@ -1,0 +1,5 @@
+1. activate flask env if you used a virtualenv
+2. run >> pip install requirements.txt
+3. Then run python api.py
+4. Open the front end and go live with live server.
+5. When you are finished go through the codes to see whats new. and push to git hub.
